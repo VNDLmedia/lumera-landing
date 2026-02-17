@@ -1,498 +1,614 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { 
-  ArrowRight, Check, Star, Bot, Zap, Shield, Lock, 
-  Play, Pause, CheckCircle2, Server, Clock, Users,
-  MousePointer2, Code2, Search, Send, Repeat, Eye,
-  Fingerprint, HardDrive, Key, Activity, ChevronDown
+import { Fragment, useEffect, useState, type FormEvent } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowRight,
+  Bot,
+  BrainCircuit,
+  Briefcase,
+  Building2,
+  Camera,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Fingerprint,
+  Lock,
+  Mail,
+  MessageSquareText,
+  Mic,
+  MousePointer2,
+  Pause,
+  PenSquare,
+  Play,
+  Send,
+  Server,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  Workflow,
 } from 'lucide-react';
 
-// Premium 3D Orb with Shader-like effect
-function PremiumOrb() {
-  return (
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] lg:w-[800px] lg:h-[800px] pointer-events-none">
-      {/* Outer glow - far */}
-      <div className="absolute inset-0 bg-orange-500/10 rounded-full blur-[150px] animate-pulse-slow"></div>
-      
-      {/* Middle glow */}
-      <div className="absolute inset-[100px] bg-gradient-to-br from-orange-400/20 via-amber-500/15 to-orange-600/20 rounded-full blur-[80px] animate-breathe"></div>
-      
-      {/* Core sphere with 3D depth */}
-      <div className="absolute inset-[180px] rounded-full overflow-hidden">
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-amber-500 to-orange-600 opacity-90"></div>
-        
-        {/* Animated shader-like overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/40 via-transparent to-transparent animate-shader"></div>
-        
-        {/* Moving highlight */}
-        <div className="absolute inset-0 bg-gradient-conic from-transparent via-white/20 to-transparent animate-spin-slow opacity-60"></div>
-        
-        {/* Inner depth shadow */}
-        <div className="absolute inset-[15%] rounded-full bg-gradient-to-br from-orange-600/50 via-amber-600/30 to-orange-700/50 blur-sm"></div>
-        
-        {/* Top shine */}
-        <div className="absolute top-[10%] left-[20%] w-[30%] h-[20%] bg-white/30 rounded-full blur-xl"></div>
-        
-        {/* Bottom reflection */}
-        <div className="absolute bottom-[15%] right-[15%] w-[25%] h-[15%] bg-white/10 rounded-full blur-lg"></div>
-      </div>
-      
-      {/* Subtle outer ring */}
-      <div className="absolute inset-[150px] border border-orange-400/10 rounded-full"></div>
-    </div>
-  );
-}
+type Demo = {
+  channel: string;
+  icon: LucideIcon;
+  prompt: string;
+  result: string;
+  timing: string;
+};
 
-// Waitlist Counter Component
-function WaitlistCounter() {
-  const [count, setCount] = useState(2847);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
-        setCount(c => c + 1);
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-  
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex -space-x-2">
-        {[...Array(4)].map((_, i) => (
-          <div 
-            key={i} 
-            className="w-8 h-8 rounded-full border-2 border-[#08080a] bg-gradient-to-br from-zinc-600 to-zinc-800"
-            style={{ zIndex: 4 - i }}
-          />
-        ))}
-      </div>
-      <div className="text-sm">
-        <span className="text-white font-bold">{count.toLocaleString()}</span>
-        <span className="text-zinc-500"> auf der Warteliste</span>
-      </div>
-    </div>
-  );
-}
+const demoItems: Demo[] = [
+  {
+    channel: 'Voice',
+    icon: Mic,
+    prompt: 'Erstell mir eine Uebersicht aller Kunden, die kuendigen wollen.',
+    result: '42 E-Mails erstellt und priorisiert',
+    timing: 'in 2 Minuten',
+  },
+  {
+    channel: 'Screenshot',
+    icon: Camera,
+    prompt: 'Hier ist der Fehler aus Produktion. Bitte sofort fixen.',
+    result: 'Root Cause analysiert, Fix gebaut und deployed',
+    timing: 'in 5 Minuten',
+  },
+  {
+    channel: 'Chat',
+    icon: MessageSquareText,
+    prompt: 'Bereite das Board Meeting fuer Freitag vor.',
+    result: 'Agenda, Slides und Termine versendet',
+    timing: 'in 9 Minuten',
+  },
+  {
+    channel: 'E-Mail',
+    icon: Mail,
+    prompt: 'FW: Dringende Anfrage vom Key Account. Angebot heute.',
+    result: 'Angebot erstellt, freigegeben und gesendet',
+    timing: 'in 7 Minuten',
+  },
+];
+
+const capabilityItems = [
+  {
+    title: 'Klickt und Navigiert',
+    description: 'Steuert Browser, CRM und interne Tools wie ein Mitarbeiter.',
+    icon: MousePointer2,
+  },
+  {
+    title: 'Schreibt und Erstellt',
+    description: 'Verfasst E-Mails, Reports, Konzepte und Code end-to-end.',
+    icon: PenSquare,
+  },
+  {
+    title: 'Kommuniziert',
+    description: 'Antwortet, plant Meetings und informiert Stakeholder proaktiv.',
+    icon: Send,
+  },
+  {
+    title: 'Automatisiert',
+    description: 'Verbindet Schritte zu stabilen Workflows ohne Setup-Overkill.',
+    icon: Workflow,
+  },
+  {
+    title: 'Lernt mit',
+    description: 'Versteht Praeferenzen, Kontexte und wird mit der Zeit besser.',
+    icon: BrainCircuit,
+  },
+  {
+    title: 'Sicher by Design',
+    description: 'Rollen, Freigaben und Audit-Faehigkeit fuer Enterprise.',
+    icon: Fingerprint,
+  },
+];
+
+const comparisonRows = [
+  { left: 'Beantwortet Fragen', right: 'Erledigt Aufgaben' },
+  { left: 'Gibt Vorschlaege', right: 'Fuehrt aus' },
+  { left: 'Braucht Anleitung', right: 'Handelt autonom' },
+  { left: 'Output: Text', right: 'Output: Ergebnisse' },
+];
+
+const securityItems = [
+  'SOC 2 Type II',
+  'ISO 27001 (in Vorbereitung)',
+  'DSGVO-konform',
+  'Serverstandort Frankfurt',
+  'Zero-Knowledge wo moeglich',
+  'On-Premise Option fuer Enterprise',
+];
 
 export default function Home() {
   const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [queueNumber, setQueueNumber] = useState<number | null>(null);
+  const [waitlistCount, setWaitlistCount] = useState(2847);
+  const [seatsLeft, setSeatsLeft] = useState(47);
+
   const [activeDemo, setActiveDemo] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  
+  const [autoPlay, setAutoPlay] = useState(true);
+
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (!autoPlay) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setActiveDemo((prev) => (prev + 1) % demoItems.length);
+    }, 4800);
+
+    return () => clearInterval(timer);
+  }, [autoPlay]);
+
+  useEffect(() => {
+    const drift = setInterval(() => {
+      if (Math.random() > 0.62) {
+        setWaitlistCount((prev) => prev + 1);
+      }
+
+      if (Math.random() > 0.86) {
+        setSeatsLeft((prev) => Math.max(19, prev - 1));
+      }
+    }, 6500);
+
+    return () => clearInterval(drift);
   }, []);
 
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(() => {
-      setActiveDemo((prev) => (prev + 1) % 4);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) setIsSubmitted(true);
+    if (!email || submitted) {
+      return;
+    }
+
+    const position = waitlistCount + 1;
+    setQueueNumber(position);
+    setWaitlistCount(position);
+    setSeatsLeft((prev) => Math.max(0, prev - 1));
+    setSubmitted(true);
   };
 
-  const demos = [
-    { input: "🎤 Voice", message: "Erstell mir eine Übersicht aller Kunden die diesen Monat kündigen wollen.", result: "42 E-Mails erstellt", time: "2 Min" },
-    { input: "📸 Foto", message: "[Screenshot einer Fehlermeldung]", result: "Bug gefixt & deployed", time: "5 Min" },
-    { input: "💬 Chat", message: "Bereite das Board Meeting morgen vor.", result: "Meeting vorbereitet", time: "10 Min" },
-    { input: "📧 E-Mail", message: "FW: Dringende Anfrage - brauchen Angebot bis EOB", result: "Angebot gesendet", time: "8 Min" },
-  ];
+  const activeDemoItem = demoItems[activeDemo];
+  const ActiveDemoIcon = activeDemoItem.icon;
+
+  const renderWaitlistForm = ({
+    buttonLabel,
+    muted,
+    formId,
+  }: {
+    buttonLabel: string;
+    muted?: boolean;
+    formId: string;
+  }) => {
+    if (submitted) {
+      return (
+        <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100 sm:px-5 sm:py-4">
+          <div className="flex items-center gap-2 font-semibold">
+            <CheckCircle2 className="h-5 w-5" />
+            Early Access bestaetigt.
+          </div>
+          <p className="mt-1 text-amber-50/85">
+            Sie sind auf Platz {queueNumber?.toLocaleString('de-DE')}. Unser Team meldet sich in 24 Stunden.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+        <label htmlFor={formId} className="sr-only">
+          E-Mail
+        </label>
+        <input
+          id={formId}
+          type="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="name@unternehmen.de"
+          className="h-12 w-full rounded-xl border border-white/12 bg-white/6 px-4 text-sm text-white placeholder:text-zinc-500 outline-none transition focus:border-amber-400/70 focus:bg-white/10"
+        />
+        <button
+          type="submit"
+          className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold transition sm:min-w-[220px] ${
+            muted
+              ? 'bg-white text-zinc-950 hover:bg-zinc-100'
+              : 'bg-gradient-to-r from-amber-400 to-orange-500 text-zinc-950 shadow-[0_0_40px_rgba(251,146,60,0.35)] hover:brightness-110'
+          }`}
+        >
+          {buttonLabel}
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      </form>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-white overflow-hidden">
-      {/* Subtle background */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_70%_40%,rgba(251,146,60,0.08),transparent)]"></div>
+    <div className="lumera-page relative min-h-screen overflow-x-clip bg-[#07070a] text-zinc-100">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_75%_0%,rgba(251,146,60,0.22),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(55%_45%_at_10%_85%,rgba(245,158,11,0.15),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.03),transparent_18%,transparent_82%,rgba(255,255,255,0.03))]" />
       </div>
 
-      {/* Navigation - More interesting */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-[#08080a]/90 backdrop-blur-xl border-b border-white/5' 
-          : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          {/* Logo - More prominent */}
-          <div className="flex items-center gap-4">
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
-              <div className="relative w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center shadow-2xl">
-                <Bot className="w-7 h-7" />
-              </div>
+      <header className="sticky top-0 z-40 border-b border-white/6 bg-[#07070a]/78 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+          <a href="#top" className="flex items-center gap-2">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 text-zinc-950">
+              <Bot className="h-5 w-5" />
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight">Lumera</span>
-              <span className="text-orange-400 font-bold">.ai</span>
-            </div>
-          </div>
-          
-          {/* Center nav - subtle */}
-          <div className="hidden lg:flex items-center gap-8">
-            {['Produkt', 'Sicherheit', 'Preise'].map((item) => (
-              <a 
-                key={item} 
-                href={`#${item.toLowerCase()}`} 
-                className="text-sm text-zinc-400 hover:text-white transition-colors relative group"
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 group-hover:w-full transition-all"></span>
-              </a>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <a 
-            href="#waitlist" 
-            className="group flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full text-sm font-bold hover:bg-zinc-100 transition-all"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+            <span className="font-display text-lg font-bold tracking-tight">
+              Lumera<span className="text-amber-300">.ai</span>
             </span>
-            Platz sichern
+          </a>
+
+          <a
+            href="#waitlist"
+            className="inline-flex h-10 items-center justify-center rounded-full border border-amber-300/35 bg-amber-300/10 px-4 text-xs font-semibold text-amber-200 transition hover:bg-amber-300/18"
+          >
+            Early Access anfragen
           </a>
         </div>
-      </nav>
+      </header>
 
-      {/* HERO - Clean & Bold */}
-      <section className="relative z-10 min-h-screen flex items-center pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <PremiumOrb />
-        
-        <div className="relative z-20 max-w-7xl mx-auto w-full">
-          <div className="max-w-2xl">
-            {/* Urgency badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-xs font-medium text-orange-400 mb-8">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-orange-500"></span>
-              </span>
-              Nur noch 47 Plätze für Early Access
+      <main className="pb-20 md:pb-0">
+        <section id="top" className="mx-auto w-full max-w-6xl px-4 pb-14 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+            <div>
+              <p className="mb-4 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold text-amber-200">
+                Nur noch {seatsLeft} Early Access Plaetze
+              </p>
+              <h1 className="font-display text-4xl font-extrabold leading-[0.95] tracking-[-0.02em] text-white sm:text-5xl lg:text-7xl">
+                Arbeit.
+                <br />
+                <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-orange-400 bg-clip-text text-transparent">
+                  Erledigt.
+                </span>
+              </h1>
+              <p className="mt-5 max-w-xl text-base text-zinc-300 sm:text-lg">
+                Ihr KI-Mitarbeiter fuer repetitive B2B-Tasks: ein Agent, der handelt statt nur zu antworten.
+                Schreiben Sie eine Nachricht. Lumera erledigt den Rest.
+              </p>
+
+              <div className="mt-7 max-w-xl">
+                {renderWaitlistForm({ buttonLabel: 'Platz sichern', formId: 'waitlist-email-hero' })}
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-4 text-xs text-zinc-400 sm:text-sm">
+                <div className="flex -space-x-2">
+                  {[0, 1, 2, 3].map((index) => (
+                    <div
+                      key={index}
+                      className="h-8 w-8 rounded-full border border-zinc-700 bg-gradient-to-br from-zinc-700 to-zinc-900"
+                    />
+                  ))}
+                </div>
+                <p>
+                  <span className="font-semibold text-zinc-100">{waitlistCount.toLocaleString('de-DE')}</span> Unternehmen auf der Warteliste
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-zinc-300">
+                  <Building2 className="h-3.5 w-3.5 text-amber-300" /> Made in Germany
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-zinc-300">
+                  <ShieldCheck className="h-3.5 w-3.5 text-amber-300" /> DSGVO-konform
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-zinc-300">
+                  <Lock className="h-3.5 w-3.5 text-amber-300" /> SOC 2
+                </span>
+              </div>
             </div>
 
-            {/* Main headline - Clear & Bold */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-black tracking-tight leading-[1] sm:leading-[0.95] mb-6">
-              <span className="text-white">Arbeit.</span>
-              <br />
-              <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">Erledigt.</span>
-            </h1>
-            
-            <p className="text-lg sm:text-xl text-zinc-400 mb-10 leading-relaxed max-w-lg">
-              Ein KI-Agent der nicht antwortet — sondern <span className="text-white font-medium">macht</span>. 
-              Schreiben Sie eine Nachricht. Lumera erledigt den Rest.
+            <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.02] p-5 shadow-[0_20px_120px_rgba(245,158,11,0.14)] sm:p-6">
+              <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-zinc-400">
+                <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+                Lumera vs. ChatGPT
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="rounded-xl bg-white/[0.03] px-3 py-2 text-zinc-400">ChatGPT</div>
+                <div className="rounded-xl bg-amber-300/15 px-3 py-2 font-semibold text-amber-100">Lumera</div>
+                {comparisonRows.map((row) => (
+                  <Fragment key={row.left}>
+                    <div className="rounded-xl border border-white/6 bg-black/25 px-3 py-3 text-zinc-400">{row.left}</div>
+                    <div className="rounded-xl border border-amber-200/20 bg-amber-400/10 px-3 py-3 text-zinc-100">
+                      {row.right}
+                    </div>
+                  </Fragment>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-white/6 bg-black/25 py-14 sm:py-20" id="demo">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+            <div className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Show, do not tell</p>
+                <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-white sm:text-4xl">
+                  Eine Nachricht rein. Ergebnis raus.
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAutoPlay((prev) => !prev)}
+                className="inline-flex h-10 w-fit items-center gap-2 rounded-full border border-white/12 bg-white/6 px-4 text-xs font-semibold text-zinc-200 transition hover:bg-white/12"
+              >
+                {autoPlay ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+                {autoPlay ? 'Auto-Rotation pausieren' : 'Auto-Rotation starten'}
+              </button>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80">
+              <div className="flex gap-2 overflow-x-auto border-b border-white/8 p-2">
+                {demoItems.map((item, index) => {
+                  const ItemIcon = item.icon;
+                  const active = activeDemo === index;
+                  return (
+                    <button
+                      key={item.channel}
+                      type="button"
+                      onClick={() => {
+                        setActiveDemo(index);
+                        setAutoPlay(false);
+                      }}
+                      className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-xs font-semibold transition ${
+                        active
+                          ? 'bg-amber-300/18 text-amber-100'
+                          : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200'
+                      }`}
+                    >
+                      <ItemIcon className="h-3.5 w-3.5" />
+                      {item.channel}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-0 md:grid-cols-2">
+                <div className="p-5 sm:p-6">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Input</p>
+                  <div className="mt-4 flex items-start gap-3">
+                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5">
+                      <ActiveDemoIcon className="h-4 w-4 text-amber-300" />
+                    </div>
+                    <p className="text-sm leading-relaxed text-zinc-200 sm:text-base">{activeDemoItem.prompt}</p>
+                  </div>
+                </div>
+                <div className="border-t border-white/8 bg-gradient-to-br from-amber-300/10 to-transparent p-5 sm:border-l sm:border-t-0 sm:p-6">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Output</p>
+                  <div className="mt-4 flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+                    <div>
+                      <p className="text-sm font-semibold text-zinc-50 sm:text-base">{activeDemoItem.result}</p>
+                      <p className="mt-1 text-xs text-zinc-300">{activeDemoItem.timing}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20" id="produkt">
+          <div className="mb-8 sm:mb-10">
+            <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Capabilities</p>
+            <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-white sm:text-4xl">
+              Kein Tool. Ein autonomer Agent.
+            </h2>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {capabilityItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article
+                  key={item.title}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-amber-300/35 hover:bg-amber-300/[0.06]"
+                >
+                  <div className="mb-4 grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-amber-300/25 to-orange-500/25 text-amber-200">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">{item.description}</p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="border-y border-white/6 bg-black/25 py-14 sm:py-20" id="social-proof">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { value: '47%', label: 'weniger Aufwand in Ops' },
+                { value: '3.2h', label: 'taeglich gesparte Zeit' },
+                { value: '2.3M', label: 'Tasks in Beta erledigt' },
+                { value: waitlistCount.toLocaleString('de-DE'), label: 'Firmen auf der Warteliste' },
+              ].map((stat) => (
+                <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5 text-center">
+                  <p className="font-display text-3xl font-bold tracking-tight text-amber-200">{stat.value}</p>
+                  <p className="mt-1 text-xs text-zinc-400 sm:text-sm">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <blockquote className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-zinc-300">
+                &ldquo;Endlich ein Agent, der Angebotsprozesse wirklich abschliesst. Unser Team spart jeden Tag messbar Zeit.&rdquo;
+                <footer className="mt-3 text-xs text-zinc-500">Head of Sales, SaaS Scale-up (Beta)</footer>
+              </blockquote>
+              <blockquote className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-zinc-300">
+                &ldquo;Lumera agiert wie ein zusaetzlicher Ops-Mitarbeiter. Schnell, strukturiert und verlaesslich in der Ausfuehrung.&rdquo;
+                <footer className="mt-3 text-xs text-zinc-500">COO, E-Commerce Enterprise (Pilot)</footer>
+              </blockquote>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20" id="sicherheit">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Security</p>
+              <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-white sm:text-4xl">
+                Enterprise-Sicherheit ohne Kompromisse.
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-300 sm:text-base">
+                Lumera ist auf deutsche und internationale Compliance-Anforderungen ausgelegt. Datenhoheit,
+                Transparenz und klare Kontrollmechanismen sind Standard.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <ul className="space-y-3">
+                {securityItems.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-zinc-200">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+                  <Server className="h-3.5 w-3.5 text-amber-300" /> Frankfurt
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+                  <ShieldCheck className="h-3.5 w-3.5 text-amber-300" /> Audit-ready
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+                  <Lock className="h-3.5 w-3.5 text-amber-300" /> Rollen und Freigaben
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-white/6 bg-black/25 py-14 sm:py-20" id="preise">
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+            <div className="mb-8 text-center sm:mb-10">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Pricing</p>
+              <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-white sm:text-4xl">
+                Premium-Positionierung. Klare Einstiegspunkte.
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-sm text-zinc-400 sm:text-base">
+                Keine Feature-Flut, kein Preischaos. Konkrete Konditionen erhalten Sie im kurzen Qualifying-Call.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                <p className="text-xs uppercase tracking-[0.16em] text-zinc-500">Startup</p>
+                <p className="font-display mt-3 text-4xl font-bold tracking-tight text-white">ab EUR 499/mo</p>
+                <ul className="mt-5 space-y-2 text-sm text-zinc-300">
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-300" />10 Agent-Stunden</li>
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-300" />5 Integrationen</li>
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-300" />E-Mail Support</li>
+                </ul>
+                <a
+                  href="#waitlist"
+                  className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-xl border border-white/14 bg-white/6 text-sm font-semibold text-white transition hover:bg-white/12"
+                >
+                  Warteliste
+                </a>
+              </article>
+
+              <article className="relative rounded-2xl border border-amber-300/35 bg-gradient-to-b from-amber-300/20 to-amber-300/4 p-6">
+                <span className="absolute -top-3 right-5 rounded-full bg-amber-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-950">
+                  Enterprise
+                </span>
+                <p className="text-xs uppercase tracking-[0.16em] text-amber-100/80">Enterprise</p>
+                <p className="font-display mt-3 text-4xl font-bold tracking-tight text-white">Custom</p>
+                <ul className="mt-5 space-y-2 text-sm text-zinc-100">
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-200" />Unbegrenzte Ausfuehrung</li>
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-200" />Alle Integrationen</li>
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-200" />Dedicated CSM</li>
+                  <li className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-200" />On-Premise Option</li>
+                </ul>
+                <a
+                  href="#waitlist"
+                  className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-xl bg-zinc-950 text-sm font-semibold text-amber-200 transition hover:bg-black"
+                >
+                  Demo anfragen
+                </a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="waitlist" className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="rounded-3xl border border-amber-300/30 bg-gradient-to-br from-amber-300/22 via-orange-500/9 to-transparent p-6 sm:p-10">
+            <p className="inline-flex items-center gap-2 rounded-full border border-red-300/35 bg-red-300/12 px-3 py-1 text-xs font-semibold text-red-100">
+              <Clock3 className="h-3.5 w-3.5" />
+              Nur noch {seatsLeft} Early Access Plaetze
+            </p>
+            <h2 className="font-display mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+              Die ersten 100 erhalten Gruenderkonditionen. Fuer immer.
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-100/85 sm:text-base">
+              Sichern Sie sich jetzt Ihren Platz. Keine Kreditkarte, kein Risiko, nur priorisierter Zugang zu
+              Lumera inklusive Onboarding durch das Founding-Team.
             </p>
 
-            {/* CTA Area */}
-            <div className="flex flex-col gap-6">
-              {!isSubmitted ? (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-                  <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@firma.de"
-                    className="flex-1 sm:max-w-xs px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all"
-                    required
-                  />
-                  <button 
-                    type="submit"
-                    className="px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl font-bold hover:from-orange-400 hover:to-amber-400 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40"
-                  >
-                    Beitreten
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </form>
-              ) : (
-                <div className="inline-flex items-center gap-3 px-5 py-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                  <CheckCircle2 className="w-5 h-5 text-orange-400" />
-                  <span className="font-medium text-orange-300">Sie sind dabei! Wir melden uns in 24h.</span>
-                </div>
-              )}
-              
-              <WaitlistCounter />
+            <div className="mt-6 max-w-xl">
+              {renderWaitlistForm({ buttonLabel: 'Early Access anfragen', muted: true, formId: 'waitlist-email-final' })}
             </div>
 
-            {/* Trust - Minimal */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-12 text-sm text-zinc-500">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-orange-400/60" />
-                DSGVO
+            <div className="mt-6 grid gap-3 text-xs text-zinc-200 sm:grid-cols-3 sm:text-sm">
+              <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/22 px-3 py-2">
+                <TrendingUp className="h-4 w-4 text-amber-200" />
+                47% weniger manueller Aufwand
               </div>
-              <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-orange-400/60" />
-                🇩🇪 Server
+              <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/22 px-3 py-2">
+                <Briefcase className="h-4 w-4 text-amber-200" />
+                Fuer Sales, Ops, Support, Finance
               </div>
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-orange-400/60" />
-                SOC 2
+              <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/22 px-3 py-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-200" />
+                Antwort innerhalb von 24 Stunden
               </div>
             </div>
           </div>
-        </div>
+        </section>
+      </main>
 
-        {/* Scroll hint */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown className="w-6 h-6 text-zinc-600" />
-        </div>
-      </section>
-
-      {/* Demo Section */}
-      <section id="demo" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Sehen ist glauben.</h2>
-            <p className="text-zinc-400">Eine Nachricht. Alles erledigt.</p>
+      <footer className="border-t border-white/8 py-8">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex items-center gap-2 text-zinc-200">
+            <Bot className="h-4 w-4 text-amber-300" /> Lumera.ai
           </div>
-
-          <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
-                <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
-                <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
-              </div>
-              <div className="flex gap-2">
-                {demos.map((demo, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setActiveDemo(i); setIsPlaying(false); }}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
-                      activeDemo === i 
-                        ? 'bg-orange-500/20 text-orange-300' 
-                        : 'text-zinc-500 hover:text-zinc-300'
-                    }`}
-                  >
-                    {demo.input}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/[0.06]">
-              <div className="p-8">
-                <div className="text-xs text-zinc-500 mb-3">INPUT</div>
-                <p className="text-zinc-200">{demos[activeDemo].message}</p>
-              </div>
-              <div className="p-8 bg-gradient-to-br from-orange-500/5 to-transparent">
-                <div className="text-xs text-zinc-500 mb-3">OUTPUT</div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-orange-400" />
-                  <span className="text-white font-medium">{demos[activeDemo].result}</span>
-                  <span className="text-zinc-500 text-sm">in {demos[activeDemo].time}</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="transition hover:text-white">
+              Datenschutz
+            </a>
+            <a href="#" className="transition hover:text-white">
+              Impressum
+            </a>
           </div>
-        </div>
-      </section>
-
-      {/* What it does - Grid */}
-      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Kein Chatbot. Ein Agent.</h2>
-            <p className="text-zinc-400">Der Unterschied: Lumera handelt.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              { icon: MousePointer2, title: 'Klickt & Navigiert', desc: 'Steuert Browser und Apps autonom' },
-              { icon: Code2, title: 'Schreibt & Erstellt', desc: 'Dokumente, E-Mails, Code — alles' },
-              { icon: Send, title: 'Kommuniziert', desc: 'Sendet, plant, informiert' },
-            ].map((item, i) => (
-              <div key={i} className="p-6 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-orange-500/20 transition-colors group">
-                <item.icon className="w-8 h-8 text-orange-400 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-zinc-500">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof - Stats */}
-      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-y border-white/[0.04]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { value: '47%', label: 'weniger Aufwand' },
-              { value: '3.2h', label: 'täglich gespart' },
-              { value: '2.3M', label: 'Tasks erledigt' },
-              { value: '<30s', label: 'durchschnittlich' },
-            ].map((stat, i) => (
-              <div key={i}>
-                <div className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">{stat.value}</div>
-                <div className="text-sm text-zinc-500 mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Security - Compact */}
-      <section id="sicherheit" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-zinc-400 mb-6">
-            <Shield className="w-3 h-3" />
-            Enterprise Security
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Deutsche Gründlichkeit.</h2>
-          <p className="text-zinc-400 mb-12 max-w-lg mx-auto">100% Made in Germany. Höchste Sicherheitsstandards. Ihr Daten bleiben Ihre Daten.</p>
-          
-          <div className="flex flex-wrap justify-center gap-4">
-            {['SOC 2 Type II', 'ISO 27001', 'DSGVO 100%', '🇩🇪 Frankfurt'].map((badge) => (
-              <div key={badge} className="px-4 py-2 bg-white/[0.02] border border-white/[0.06] rounded-lg text-sm text-zinc-300">
-                {badge}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing - Simple */}
-      <section id="preise" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Einfache Preise</h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-              <div className="text-zinc-400 text-sm mb-2">Startup</div>
-              <div className="text-4xl font-bold mb-4">€499<span className="text-lg text-zinc-500">/mo</span></div>
-              <ul className="space-y-2 mb-6 text-sm text-zinc-400">
-                {['10 Agent-Stunden', '5 Integrationen', 'E-Mail Support'].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-orange-400" />{f}
-                  </li>
-                ))}
-              </ul>
-              <a href="#waitlist" className="block w-full py-3 text-center border border-white/10 rounded-lg font-medium hover:bg-white/5 transition-colors">
-                Warteliste
-              </a>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-gradient-to-b from-orange-500/10 to-transparent border border-orange-500/20 relative">
-              <div className="absolute -top-3 right-6 px-2 py-0.5 bg-orange-500 rounded text-xs font-bold">
-                POPULAR
-              </div>
-              <div className="text-orange-400 text-sm mb-2">Enterprise</div>
-              <div className="text-4xl font-bold mb-4">Custom</div>
-              <ul className="space-y-2 mb-6 text-sm text-zinc-400">
-                {['Unbegrenzt', 'Alle Integrationen', 'Dedicated Support', 'On-Premise'].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-orange-400" />{f}
-                  </li>
-                ))}
-              </ul>
-              <a href="#waitlist" className="block w-full py-3 text-center bg-orange-500 hover:bg-orange-400 rounded-lg font-medium transition-colors">
-                Demo anfragen
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA - Strong FOMO */}
-      <section id="waitlist" className="relative z-10 py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center">
-          {/* Urgency */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-sm mb-8">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-            </span>
-            <span className="text-red-400 font-medium">Nur noch 47 Early Access Plätze</span>
-          </div>
-
-          <h2 className="text-4xl sm:text-5xl font-black mb-6">
-            Fast verpasst.
-          </h2>
-          
-          <p className="text-lg text-zinc-400 mb-10">
-            2.847 Unternehmen warten bereits. Die ersten 100 bekommen Gründerkonditionen.
-            <span className="text-white font-medium"> Für immer.</span>
-          </p>
-
-          {!isSubmitted ? (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@firma.de"
-                className="flex-1 px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-all"
-                required
-              />
-              <button 
-                type="submit"
-                className="px-8 py-4 bg-white text-black rounded-xl font-bold hover:bg-zinc-100 transition-all flex items-center justify-center gap-2"
-              >
-                Platz sichern
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </form>
-          ) : (
-            <div className="inline-flex items-center gap-3 px-6 py-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-              <CheckCircle2 className="w-6 h-6 text-orange-400" />
-              <span className="font-semibold text-orange-300">Sie sind dabei!</span>
-            </div>
-          )}
-
-          <p className="text-xs text-zinc-600 mt-6">Kein Spam. Keine Kreditkarte. Nur ein Platz auf der Liste.</p>
-        </div>
-      </section>
-
-      {/* Footer - Minimal */}
-      <footer className="relative z-10 py-8 px-4 sm:px-6 lg:px-8 border-t border-white/[0.04]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Bot className="w-5 h-5 text-orange-400" />
-            <span className="font-semibold">Lumera.ai</span>
-          </div>
-          <div className="flex gap-6 text-sm text-zinc-500">
-            <a href="#" className="hover:text-white transition-colors">Datenschutz</a>
-            <a href="#" className="hover:text-white transition-colors">Impressum</a>
-          </div>
-          <div className="text-sm text-zinc-600">🇩🇪 Made in Germany</div>
+          <div className="text-zinc-500">Made in Germany</div>
         </div>
       </footer>
 
-      {/* Animations */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#07070a]/92 p-3 backdrop-blur md:hidden">
+        <a
+          href="#waitlist"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-300 to-orange-500 text-sm font-semibold text-zinc-950"
+        >
+          Early Access sichern
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
+
       <style jsx global>{`
-        @keyframes breathe {
-          0%, 100% { transform: scale(1); opacity: 0.6; }
-          50% { transform: scale(1.05); opacity: 0.8; }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
+
+        .lumera-page {
+          font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
         }
-        @keyframes shader {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.02); }
-        }
-        .animate-breathe { animation: breathe 4s ease-in-out infinite; }
-        .animate-shader { animation: shader 8s linear infinite; }
-        .animate-spin-slow { animation: spin-slow 15s linear infinite; }
-        .animate-pulse-slow { animation: pulse-slow 5s ease-in-out infinite; }
-        .bg-gradient-conic {
-          background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.15), transparent);
+
+        .font-display {
+          font-family: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+          letter-spacing: -0.015em;
         }
       `}</style>
     </div>
