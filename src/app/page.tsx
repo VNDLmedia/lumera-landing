@@ -11,7 +11,7 @@ import {
 // Premium 3D Orb with Shader-like effect
 function PremiumOrb() {
   return (
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] pointer-events-none">
+    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] lg:w-[800px] lg:h-[800px] pointer-events-none">
       {/* Outer glow - far */}
       <div className="absolute inset-0 bg-orange-500/10 rounded-full blur-[150px] animate-pulse-slow"></div>
       
@@ -123,7 +123,7 @@ export default function Home() {
           ? 'bg-[#08080a]/90 backdrop-blur-xl border-b border-white/5' 
           : 'bg-transparent'
       }`}>
-        <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
           {/* Logo - More prominent */}
           <div className="flex items-center gap-4">
             <div className="relative group">
@@ -167,7 +167,7 @@ export default function Home() {
       </nav>
 
       {/* HERO - Clean & Bold */}
-      <section className="relative z-10 min-h-screen flex items-center pt-24 pb-16 px-8">
+      <section className="relative z-10 min-h-screen flex items-center pt-24 pb-16 px-4 sm:px-6 lg:px-8">
         <PremiumOrb />
         
         <div className="relative z-20 max-w-7xl mx-auto w-full">
@@ -182,13 +182,13 @@ export default function Home() {
             </div>
 
             {/* Main headline - Clear & Bold */}
-            <h1 className="text-[clamp(3rem,7vw,5.5rem)] font-black tracking-tight leading-[0.95] mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-black tracking-tight leading-[1] sm:leading-[0.95] mb-6">
               <span className="text-white">Arbeit.</span>
               <br />
               <span className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">Erledigt.</span>
             </h1>
             
-            <p className="text-xl text-zinc-400 mb-10 leading-relaxed max-w-lg">
+            <p className="text-lg sm:text-xl text-zinc-400 mb-10 leading-relaxed max-w-lg">
               Ein KI-Agent der nicht antwortet — sondern <span className="text-white font-medium">macht</span>. 
               Schreiben Sie eine Nachricht. Lumera erledigt den Rest.
             </p>
@@ -196,18 +196,18 @@ export default function Home() {
             {/* CTA Area */}
             <div className="flex flex-col gap-6">
               {!isSubmitted ? (
-                <form onSubmit={handleSubmit} className="flex gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
                   <input 
                     type="email" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@firma.de"
-                    className="flex-1 max-w-xs px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all"
+                    className="flex-1 sm:max-w-xs px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all"
                     required
                   />
                   <button 
                     type="submit"
-                    className="px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl font-bold hover:from-orange-400 hover:to-amber-400 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40"
+                    className="px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl font-bold hover:from-orange-400 hover:to-amber-400 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40"
                   >
                     Beitreten
                     <ArrowRight className="w-5 h-5" />
@@ -224,7 +224,7 @@ export default function Home() {
             </div>
 
             {/* Trust - Minimal */}
-            <div className="flex items-center gap-6 mt-12 text-sm text-zinc-500">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-12 text-sm text-zinc-500">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-orange-400/60" />
                 DSGVO
@@ -248,10 +248,10 @@ export default function Home() {
       </section>
 
       {/* Demo Section */}
-      <section id="demo" className="relative z-10 py-24 px-8">
+      <section id="demo" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Sehen ist glauben.</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Sehen ist glauben.</h2>
             <p className="text-zinc-400">Eine Nachricht. Alles erledigt.</p>
           </div>
 
@@ -298,10 +298,10 @@ export default function Home() {
       </section>
 
       {/* What it does - Grid */}
-      <section className="relative z-10 py-24 px-8">
+      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Kein Chatbot. Ein Agent.</h2>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Kein Chatbot. Ein Agent.</h2>
             <p className="text-zinc-400">Der Unterschied: Lumera handelt.</p>
           </div>
 
@@ -322,7 +322,7 @@ export default function Home() {
       </section>
 
       {/* Social Proof - Stats */}
-      <section className="relative z-10 py-24 px-8 border-y border-white/[0.04]">
+      <section className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-y border-white/[0.04]">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -341,13 +341,13 @@ export default function Home() {
       </section>
 
       {/* Security - Compact */}
-      <section id="sicherheit" className="relative z-10 py-24 px-8">
+      <section id="sicherheit" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs font-medium text-zinc-400 mb-6">
             <Shield className="w-3 h-3" />
             Enterprise Security
           </div>
-          <h2 className="text-4xl font-bold mb-4">Deutsche Gründlichkeit.</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Deutsche Gründlichkeit.</h2>
           <p className="text-zinc-400 mb-12 max-w-lg mx-auto">100% Made in Germany. Höchste Sicherheitsstandards. Ihr Daten bleiben Ihre Daten.</p>
           
           <div className="flex flex-wrap justify-center gap-4">
@@ -361,10 +361,10 @@ export default function Home() {
       </section>
 
       {/* Pricing - Simple */}
-      <section id="preise" className="relative z-10 py-24 px-8">
+      <section id="preise" className="relative z-10 py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Einfache Preise</h2>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Einfache Preise</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -405,7 +405,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA - Strong FOMO */}
-      <section id="waitlist" className="relative z-10 py-32 px-8">
+      <section id="waitlist" className="relative z-10 py-20 sm:py-32 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           {/* Urgency */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-sm mb-8">
@@ -416,7 +416,7 @@ export default function Home() {
             <span className="text-red-400 font-medium">Nur noch 47 Early Access Plätze</span>
           </div>
 
-          <h2 className="text-5xl font-black mb-6">
+          <h2 className="text-4xl sm:text-5xl font-black mb-6">
             Fast verpasst.
           </h2>
           
@@ -455,7 +455,7 @@ export default function Home() {
       </section>
 
       {/* Footer - Minimal */}
-      <footer className="relative z-10 py-8 px-8 border-t border-white/[0.04]">
+      <footer className="relative z-10 py-8 px-4 sm:px-6 lg:px-8 border-t border-white/[0.04]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-orange-400" />
